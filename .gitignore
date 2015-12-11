@@ -46,12 +46,13 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-.asv
-.mat
-.exe
-.mex
-.caffemodel
+*.asv
+*.mat
+*.exe
+*.mex
+*.caffemodel
 data/
 bin/
 caffe_dev/
 net_out/
+bin/
