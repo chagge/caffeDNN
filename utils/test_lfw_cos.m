@@ -40,6 +40,8 @@
     plot(fpr,tpr,'b','DisplayName',num2str(i))
     hold on
     ROC = abs(trapz(fpr, tpr));
+    [~,id_t] = min(abs(fpr-0.05));
+    VAL = tpr(id_t);
 %     ROC(j) = abs(trapz(fpr, tpr));
 %     figure(2)
 %     plot(ROC);

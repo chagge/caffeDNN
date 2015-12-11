@@ -7,7 +7,7 @@ para.test_lfw = 1;
 para.test_xfext = 1;
 %%compute phase
 para.gpuid = 0:3;
-para.num_per_gpu = 85;
+para.num_per_gpu = 64;
 para.input_size = 224;
 para.feature_length = 128;
 para.feature_layer_name = 'fc128';
