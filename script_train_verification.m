@@ -73,7 +73,7 @@ while ~exist('iter', 'var') || iter < max_iter
             test_lfw_cos;%80 secs on 2 * GTX 980Ti  52.5 secs on 3 * GTX Titan X
             roc_lfw(testiter) = ROC;
             test_xfext_cos;%83.6 secs on 3 * GTX Titan X
-            if ROC <= min(roc_lab)
+            if ~exist('roc_lab', 'var') || ROC <= min(roc_lab)
                 DNN.caffe_mex('snapshot', fullfile(para.path_best,['iter' num2str(iter)]));
             end
             roc_lab(testiter) = ROC;
