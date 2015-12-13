@@ -7,7 +7,7 @@ else
         l = max(rect_t(1), 1);
         r = min(rect_t(1)+rect_t(3), size(img_t, 2));
         t = max(rect_t(2), 1);
-        b = min(rect_t(2)+rect_t(4), size(img_t, 2));
+        b = min(rect_t(2)+rect_t(4), size(img_t, 1));
         img_t = img_t(t:b, l:r, :);
         if size(img_t, 3) < 3
             img_t = img_t(:,:,[1 1 1]);

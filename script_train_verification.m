@@ -85,6 +85,10 @@ while ~exist('iter', 'var') || iter < max_iter
             plot(roc_lfw,'r');
             hold on
             plot(roc_lab,'g');
+            plot(val_lfw,'b');
+            plot(val_lab,'y');
+            
+            legend('ROC_{LFW}','ROC_{XF}','VAL_{LFW}','VAL_{XF}');
             hold off
         end
 
