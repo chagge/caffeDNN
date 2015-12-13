@@ -47,6 +47,7 @@ while ~exist('iter', 'var') || iter < max_iter
         if loss > 50
             fprintf('Loss large than threshold in iter %d, break.\n', iter);
             fprintf('Max label is %d\n', max(train_batch_labels));
+            waitforbuttonpress;
             break;
         end
         if mod(iter-baseiter,10)<1

@@ -3,8 +3,8 @@ run('init.m')
 
 para.pre_load_data = 0;
 %%test phase
-para.test_lfw = 0;
-para.test_xfext = 0;
+para.test_lfw = 1;
+para.test_xfext = 1;
 %%compute phase
 para.gpuid = 0:3;
 para.num_per_gpu = 48;
