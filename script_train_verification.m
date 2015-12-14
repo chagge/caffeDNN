@@ -78,7 +78,7 @@ while ~exist('iter', 'var') || iter < max_iter
             test_xfext_cos;%83.6 secs on 3 * GTX Titan X;
             val_lab(testiter) = VAL;
             if ~exist('roc_lab', 'var') || ROC <= min(roc_lab)
-                DNN.caffe_mex('snapshot', fullfile(para.path_best,['iter' num2str(iter)]));
+                DNN.caffe_mex('snapshot', fullfile(para.path_best,'model'));
             end
             roc_lab(testiter) = ROC;
             testiter = testiter + 1;
@@ -89,7 +89,7 @@ while ~exist('iter', 'var') || iter < max_iter
             plot(val_lfw,'b');
             plot(val_lab,'y');
             
-            legend('ROC_{LFW}','ROC_{XF}','VAL_{LFW}','VAL_{XF}');
+            legend('ROC_{LFW}','ROC_{XF}','VAL_{LFW}','VAL_{XF}', 'Location', 'SouthEast');
             hold off
         end
 

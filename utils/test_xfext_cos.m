@@ -36,9 +36,9 @@
         fpr(itert) = fl/numel(fscore);
         itert = itert + 1;
     end
-    figure(4)
-    plot(fpr,tpr,'b','DisplayName',num2str(i))
-    hold on
+%     figure(4)
+%     plot(fpr,tpr,'b','DisplayName',num2str(i))
+%     hold on
     ROC = abs(trapz(fpr, tpr));
     [~,id_t] = min(abs(fpr-0.05));
     VAL = tpr(id_t);
