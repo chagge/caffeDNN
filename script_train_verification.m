@@ -5,8 +5,11 @@ while ~exist('iter', 'var') || iter < max_iter
         reset_all;
     end
     if exist('loss', 'var') && loss > 20
-        reset_all
+        reset_all;
     end
+%     if ~DNN.caffe_mex('is_initialized')
+%         reset_all;
+%     end
     tic
     train_batch_imgs = zeros(para.input_size,para.input_size,para.data_channels,batch_per_gpu*n_gpu);
     train_batch_labels = zeros(batch_per_gpu*n_gpu, 1);
@@ -78,7 +81,7 @@ while ~exist('iter', 'var') || iter < max_iter
             test_xfext_cos;%83.6 secs on 3 * GTX Titan X;
             val_lab(testiter) = VAL;
             if ~exist('roc_lab', 'var') || ROC <= min(roc_lab)
-                DNN.caffe_mex('snapshot', fullfile(para.path_best,'model'));
+                DNN.caffe_mex('snapshot', fullfile(para.path_best,['iter' num2str(iter)]));
             end
             roc_lab(testiter) = ROC;
             testiter = testiter + 1;
@@ -92,7 +95,10 @@ while ~exist('iter', 'var') || iter < max_iter
             legend('ROC_{LFW}','ROC_{XF}','VAL_{LFW}','VAL_{XF}', 'Location', 'SouthEast');
             hold off
         end
-
+        
+        if para.debug
+            check_response;
+        end
     %     figure(1)
     %     plot(tr_acc, 'g');
     %     hold on
