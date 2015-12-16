@@ -57,3 +57,4 @@ caffe_dev/
 net_out/
 bin/
 exp/
+log/
