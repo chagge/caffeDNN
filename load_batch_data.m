@@ -34,7 +34,7 @@ end
 if isfield(para, 'gray_augment_ratio') && para.gray_augment_ratio > 0
     id_t = find(rand(para.num_per_batch, 1) > para.gray_augment_ratio ~= 0);
     for i_t = 1 : numel(id_t)
-        train_batch_imgs(:,:,:,id_t(i_t)) = repmat(rgb2gray(train_batch_imgs(:,:,:,id_t(i_t)), [1 1 3]));
+        train_batch_imgs(:,:,:,id_t(i_t)) = repmat(rgb2gray(train_batch_imgs(:,:,:,id_t(i_t))), [1 1 3]);
     end
 end
 for i = 1:n_gpu
