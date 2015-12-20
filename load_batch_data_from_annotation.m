@@ -1,6 +1,4 @@
-if para.pre_load_data
-    train_batch_imgs(:,:,:,1:num_per_batch) = data_train(:,:,:,train_batch_id);
-else
+function train_batch = load_batch_data_from_annotation(list_train, rect_train, label_train, para)
 %     errid = [];
 %     for i_t = 1 : num_per_batch
 %         try
@@ -21,10 +19,10 @@ else
 %             errid = [errid, i_t];
 %         end
 %     end
-    train_batch_imgs = cv.prepare_data_from_annotation_omp(list_train(train_batch_id), rect_train(train_batch_id,:)', para.input_size);
-    train_batch_imgs = permute(train_batch_imgs, [2 3 1 4]);
-    train_batch_labels(1:num_per_batch) = label_train(train_batch_id)-1;
-end
+train_batch_imgs = cv.prepare_data_from_annotation_omp(list_train(train_batch_id), rect_train(train_batch_id,:)', para.input_size);
+train_batch_imgs = permute(train_batch_imgs, [2 3 1 4]);
+train_batch_labels(1:num_per_batch) = label_train(train_batch_id)-1;
+
 % if isempty(errid)
 %     train_batch_labels(1:num_per_batch) = label_train(train_batch_id)-1;
 % else
@@ -38,7 +36,7 @@ if isfield(para, 'gray_augment_ratio') && para.gray_augment_ratio > 0
     end
 end
 for i = 1:n_gpu
-    dataid = ((i-1)*batch_per_gpu+1):i*batch_per_gpu;
+    dataid = ((i-1)*batch_per_gpu+1):i*para.num_per_gpu;
     train_batch{i}{2} = single(zeros(1,1,1,para.num_per_gpu));
     train_batch{i}{1} = single(train_batch_imgs(:,:,:,dataid));
     train_batch{i}{1} = bsxfun(@minus,train_batch{i}{1},single(meanmat));
