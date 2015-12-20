@@ -1,4 +1,4 @@
-function train_batch = load_batch_data_from_annotation(list_train, rect_train, label_train, para)
+function train_batch = load_batch_data_from_annotation(list_train, rect_train, label_train, meanmat, para)
 %     errid = [];
 %     for i_t = 1 : num_per_batch
 %         try
@@ -19,9 +19,11 @@ function train_batch = load_batch_data_from_annotation(list_train, rect_train, l
 %             errid = [errid, i_t];
 %         end
 %     end
-    train_batch_imgs = cv.prepare_data_from_annotation_omp(list_train(train_batch_id), rect_train(train_batch_id,:)', para.input_size);
+
+    train_batch_labels = zeros(para.num_per_gpu*numel(para.gpuid), 1);
+    train_batch_imgs = cv.prepare_data_from_annotation_omp(list_train, rect_train', para.input_size);
     train_batch_imgs = permute(train_batch_imgs, [2 3 1 4]);
-    train_batch_labels(1:num_per_batch) = label_train(train_batch_id)-1;
+    train_batch_labels(1:para.num_per_batch) = label_train-1;
 
     % if isempty(errid)
     %     train_batch_labels(1:num_per_batch) = label_train(train_batch_id)-1;
@@ -35,8 +37,8 @@ function train_batch = load_batch_data_from_annotation(list_train, rect_train, l
             train_batch_imgs(:,:,:,id_t(i_t)) = repmat(rgb2gray(train_batch_imgs(:,:,:,id_t(i_t))), [1 1 3]);
         end
     end
-    for i = 1:n_gpu
-        dataid = ((i-1)*batch_per_gpu+1):i*para.num_per_gpu;
+    for i = 1:numel(para.gpuid)
+        dataid = ((i-1)*para.num_per_gpu+1):i*para.num_per_gpu;
         train_batch{i}{2} = single(zeros(1,1,1,para.num_per_gpu));
         train_batch{i}{1} = single(train_batch_imgs(:,:,:,dataid));
         train_batch{i}{1} = bsxfun(@minus,train_batch{i}{1},single(meanmat));

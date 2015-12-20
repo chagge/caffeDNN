@@ -1,4 +1,6 @@
-parpool(1)
+if isempty(gcp('nocreate'))
+    parpool(1);
+end
 while ~exist('iter', 'var') || iter < max_iter
 
     if ~exist('iter', 'var')
@@ -11,8 +13,6 @@ while ~exist('iter', 'var') || iter < max_iter
 %         reset_all;
 %     end
     tic
-    train_batch_imgs = zeros(para.input_size,para.input_size,para.data_channels,batch_per_gpu*n_gpu);
-    train_batch_labels = zeros(batch_per_gpu*n_gpu, 1);
     num_per_batch = batch_per_gpu*n_gpu;
     if exist('tr_acc', 'var')
         tr_acc(iter-baseiter:end)=[];
@@ -31,15 +31,20 @@ while ~exist('iter', 'var') || iter < max_iter
         changeid = 0;
         thisbatchid = 1;
     end
+    
+    %%start train
+    train_batch_id = trainid(mod(nowid:nowid+para.num_per_batch-1, para.data_num)+1);
+    pf_data = parfeval(@load_batch_data, 1, list_train(train_batch_id), rect_train(train_batch_id,:), label_train(train_batch_id), meanmat, para);
     for iter = iter_:max_iter
         shuffle_data;
         drawnow;
         %this data preparing part use 0.15s for 8*32=256 images
 %         train_batch_select_class = mod(randperm(max(label_train)*100, num_per_batch), max(label_train))+1;
 %         train_batch_id = arrayfun(@(x)idx{train_batch_select_class(x)}(randperm(numel(idx{train_batch_select_class(x)}), 1)), 1:num_per_batch);
-        train_batch_id = trainid(mod(nowid:nowid+num_per_batch-1, para.data_num)+1);
-        nowid = nowid + num_per_batch;
-        load_batch_data;
+        train_batch_id = trainid(mod(nowid:nowid+para.num_per_batch-1, para.data_num)+1);
+        nowid = nowid + para.num_per_batch;
+        train_batch = fetchOutputs(pf_data);
+        pf_data = parfeval(@load_batch_data, 1, list_train(train_batch_id), rect_train(train_batch_id,:), label_train(train_batch_id), meanmat, para);
         %this training part spend 1.014s for 8*32=256 images
         thisbatchid = thisbatchid + 1;
         ret = DNN.caffe_mex('train', train_batch);
