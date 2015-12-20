@@ -1,4 +1,4 @@
-
+parpool(1)
 while ~exist('iter', 'var') || iter < max_iter
 
     if ~exist('iter', 'var')
