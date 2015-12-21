@@ -1,1 +1,0 @@
-$(Netname)_for_$(task)_[$(paraname)$(para)]
