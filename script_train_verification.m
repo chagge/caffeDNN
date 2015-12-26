@@ -86,6 +86,9 @@ while ~exist('iter', 'var') || iter < max_iter
             test_xfext_cos;%83.6 secs on 3 * GTX Titan X;
             val_lab(testiter) = VAL;
             if ~exist('roc_lab', 'var') || ROC >= min(roc_lab)
+                if ~exist(para.path_best, 'file')
+                    mkdir(para.path_best);
+                end
                 DNN.caffe_mex('snapshot', fullfile(para.path_best,'model'));
             end
             roc_lab(testiter) = ROC;
