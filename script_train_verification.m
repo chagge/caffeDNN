@@ -82,7 +82,13 @@ while ~exist('iter', 'var') || iter < max_iter
 
         %save result
         if mod(iter,1000)<1
-            DNN.caffe_mex('snapshot', fullfile(para.path_output,['iter' num2str(iter)]));
+            snapshotname = fullfile(para.path_output,['iter' num2str(iter)]);
+            nowpath = pwd;
+            cd(para.path_output);
+            DNN.caffe_mex('snapshot', snapshotname);
+            DNN.caffe_mex('release_solver');
+            DNN.caffe_mex('set_device_solver', para.gpuid);
+            DNN.caffe_mex('init_solver', 'solver_noloss.prototxt', snapshotname);
             fprintf('Start testing...');
             test_lfw_cos;%80 secs on 2 * GTX 980Ti  52.5 secs on 3 * GTX Titan X
             roc_lfw(testiter) = ROC;
@@ -105,6 +111,10 @@ while ~exist('iter', 'var') || iter < max_iter
             plot(val_lfw,'b');
             plot(val_lab,'y');
             
+            DNN.caffe_mex('release_solver');
+            DNN.caffe_mex('set_device_solver', para.gpuid);
+            DNN.caffe_mex('recovery_solver', 'solver.prototxt', [snapshotname '.solverstate'], 'log/');
+            cd(nowpath);
             legend('ROC_{LFW}','ROC_{XF}','VAL_{LFW}','VAL_{XF}', 'Location', 'SouthEast');
             hold off
         end
