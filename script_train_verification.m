@@ -43,8 +43,13 @@ while ~exist('iter', 'var') || iter < max_iter
 %         train_batch_id = arrayfun(@(x)idx{train_batch_select_class(x)}(randperm(numel(idx{train_batch_select_class(x)}), 1)), 1:num_per_batch);
         train_batch_id = trainid(mod(nowid:nowid+para.num_per_batch-1, para.data_num)+1);
         nowid = nowid + para.num_per_batch;
-        train_batch = fetchOutputs(pf_data);
+        if isempty(gcp('nocreate'))
+            parpool(1);
+        else
+            train_batch = fetchOutputs(pf_data);
+        end
         pf_data = parfeval(@load_batch_data, 1, list_train(train_batch_id), rect_train(train_batch_id,:), label_train(train_batch_id), meanmat, para);
+%         train_batch = load_batch_data(list_train(train_batch_id), rect_train(train_batch_id,:), label_train(train_batch_id), meanmat, para);
         %this training part spend 1.014s for 8*32=256 images
         thisbatchid = thisbatchid + 1;
         ret = DNN.caffe_mex('train', train_batch);
