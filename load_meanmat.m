@@ -9,11 +9,11 @@ if ~exist('meanmat', 'var')
                 meanmat = mean(data_train,4);
             else
                 meanmat_t = zeros(para.input_size, para.input_size, para.data_channels, mod(para.data_num, 1000));
-                for i_tt = 1 : mod(para.data_num, 1000)
+                for i_tt = 1 : floor(para.data_num/ 1000)
                     mean_t = zeros(para.input_size, para.input_size, para.data_channels, 1000);
                     for i_t = 1 : 1000
-                        img_t = imread(list_train{i_t});
-                        rect_t = round(rect_train(i_t,:));
+                        img_t = imread(list_train{i_t+1000*(i_tt-1)});
+                        rect_t = round(rect_train(i_t+1000*(i_tt-1),:));
                         l = max(rect_t(1), 1);
                         r = min(rect_t(1)+rect_t(3), size(img_t, 2));
                         t = max(rect_t(2), 1);
