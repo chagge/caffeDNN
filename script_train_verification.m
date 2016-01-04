@@ -1,3 +1,4 @@
+copyfile(fullfile(para.path_net, '*'), para.path_output);
 if isempty(gcp('nocreate'))
     parpool(1);
 end

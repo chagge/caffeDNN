@@ -1,15 +1,23 @@
+fprintf('Loading meanmat...')
 if ~exist('meanmat', 'var')
-    if exist(fullfile(para.path_output, 'meanmat.mat'), 'file')
-        load(fullfile(para.path_output, 'meanmat.mat'));
+    if isfield(para, 'meanmat_dir') && exist(para.meanmat_dir, 'file')
+        load(para.meanmat_dir)
+        fprintf('Use %s\n', para.meanmat_dir);
     else
         if para.fast_meanmat
             meanmat = 127*ones(para.input_size, para.input_size, para.data_channels);
+            fprintf('Use fast meanmat 127\n')
         else
+            fprintf('\nRebuild meanmat...\n')
             if para.pre_load_data
                 meanmat = mean(data_train,4);
             else
-                meanmat_t = zeros(para.input_size, para.input_size, para.data_channels, mod(para.data_num, 1000));
+                tic
+                meanmat_t = zeros(para.input_size, para.input_size, para.data_channels, floor(para.data_num/1000));
                 for i_tt = 1 : floor(para.data_num/ 1000)
+%                     if mod(i_tt, floor(para.data_num/ 100000)) < 1
+                        fprintf('Meanmat proceeding...(%d/%d)\n', i_tt, floor(para.data_num/ 1000));
+%                     end
                     mean_t = zeros(para.input_size, para.input_size, para.data_channels, 1000);
                     for i_t = 1 : 1000
                         img_t = imread(list_train{i_t+1000*(i_tt-1)});
@@ -34,8 +42,11 @@ if ~exist('meanmat', 'var')
                 end
                 meanmat = mean(meanmat_t, 4);
                 meanmat = permute(meanmat(:,:,para.data_channels:-1:1), [2 1 3]);
+                toc
             end
             save(fullfile(para.path_output, 'meanmat.mat'),'meanmat');
         end
     end
+else
+    fprintf('Exist meanmat.\n');
 end
