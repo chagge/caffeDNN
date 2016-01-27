@@ -23,7 +23,7 @@ function  visualize( blob )
     fprintf('min: %f max: %f\n', bmin, bmax);
     for i = 1 : bsize(4)
         subplot(c,r,i)
-        imshow(blob(:,:,1,i));
+        imshow(blob(:,:,:,i));
     end
 end
 
