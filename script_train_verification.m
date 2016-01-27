@@ -24,7 +24,7 @@ while ~exist('iter', 'var') || iter < max_iter
     if exist('roc_lfw', 'var')
         roc_lfw(testiter:end)=[];
     end
-    check_weight;
+    %check_weight;
     if ~exist('nowid', 'var')
         nowid = 0;
     end
@@ -53,7 +53,15 @@ while ~exist('iter', 'var') || iter < max_iter
 %         train_batch = load_batch_data(list_train(train_batch_id), rect_train(train_batch_id,:), label_train(train_batch_id), meanmat, para);
         %this training part spend 1.014s for 8*32=256 images
         thisbatchid = thisbatchid + 1;
-        ret = DNN.caffe_mex('train', train_batch);
+        %ret = DNN.caffe_mex('train', train_batch);==================
+        
+        caffe_solver.net.blobs('data').set_data_multigpu(train_batch{1});   % {[gpu_0],[gpu_1],...,[gpu_n]}
+        caffe_solver.net.blobs('label').set_data_multigpu(train_batch{2});  % {[gpu_0],[gpu_1],...,[gpu_n]}
+        caffe_solver.step(1);
+        
+        ret_loss = caffe.passthrough('blob_get_data_byname_multigpu','loss');
+        ret_acc = caffe.passthrough('blob_get_data_byname_multigpu','accuracy');
+        
     %     debug_fc
     %     debug_fc;
     %     weight = DNN.caffe_mex('get_weights_solver');
@@ -86,10 +94,16 @@ while ~exist('iter', 'var') || iter < max_iter
             snapshotname = fullfile(para.path_output,['iter' num2str(iter)]);
             nowpath = pwd;
             cd(para.path_output);
-            DNN.caffe_mex('snapshot', snapshotname);
-            DNN.caffe_mex('release_solver');
-            DNN.caffe_mex('set_device_solver', para.gpuid);
-            DNN.caffe_mex('init_solver', 'solver_noloss.prototxt', snapshotname);
+            %DNN.caffe_mex('snapshot', snapshotname);
+            caffe_solver.snapshot(snapshotname)
+            
+            %DNN.caffe_mex('release_solver');
+            caffe.reset_all;
+            
+            %DNN.caffe_mex('set_device_solver', para.gpuid);
+            %DNN.caffe_mex('init_solver', 'solver_noloss.prototxt', snapshotname);
+            caffe_solver = caffe.Solver('solver.prototxt',snapshotname);
+            
             fprintf('Start testing...');
             test_lfw_cos;%80 secs on 2 * GTX 980Ti  52.5 secs on 3 * GTX Titan X
             roc_lfw(testiter) = ROC;

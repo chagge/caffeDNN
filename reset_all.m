@@ -2,7 +2,7 @@ close all;
 fclose all;
 clear mex;
 clear testiter tr_acc tr_loss roc_lab roc_lfw iter
-DNN.caffe_mex('set_random_seed', para.seed_caffe);
+%DNN.caffe_mex('set_random_seed', para.seed_caffe);==================
 rand('seed', para.seed_matlab);
 load_test_data;
 load_meanmat;

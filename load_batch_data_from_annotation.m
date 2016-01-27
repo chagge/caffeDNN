@@ -21,8 +21,9 @@ function train_batch = load_batch_data_from_annotation(list_train, rect_train, l
 %     end
 
     train_batch_labels = zeros(para.num_per_gpu*numel(para.gpuid), 1);
-    train_batch_imgs = cv.prepare_data_from_annotation_omp(list_train, rect_train', para.input_size);
-    train_batch_imgs = permute(train_batch_imgs, [2 3 1 4]);
+    %train_batch_imgs = cv.prepare_data_from_annotation_omp(list_train, rect_train', para.input_size);===========
+    train_batch_imgs = rand(para.input_size,para.input_size,3,para.num_per_batch);
+    %train_batch_imgs = permute(train_batch_imgs, [2 3 1 4]);
     train_batch_labels(1:para.num_per_batch) = label_train-1;
 
     % if isempty(errid)
@@ -39,9 +40,9 @@ function train_batch = load_batch_data_from_annotation(list_train, rect_train, l
     end
     for i = 1:numel(para.gpuid)
         dataid = ((i-1)*para.num_per_gpu+1):i*para.num_per_gpu;
-        train_batch{i}{2} = single(zeros(1,1,1,para.num_per_gpu));
-        train_batch{i}{1} = single(train_batch_imgs(:,:,:,dataid));
-        train_batch{i}{1} = bsxfun(@minus,train_batch{i}{1},single(meanmat));
-        train_batch{i}{2}(1,1,1,:) = single(train_batch_labels(dataid));
+        train_batch{2}{i} = single(zeros(1,1,1,para.num_per_gpu));
+        train_batch{1}{i} = single(train_batch_imgs(:,:,:,dataid));
+        train_batch{1}{i} = bsxfun(@minus,train_batch{1}{i},single(meanmat));
+        train_batch{2}{i}(1,1,1,:) = single(train_batch_labels(dataid));
     end
 end
