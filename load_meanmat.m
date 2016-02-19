@@ -50,3 +50,6 @@ if ~exist('meanmat', 'var')
 else
     fprintf('Exist meanmat.\n');
 end
+sizemat = size(meanmat);
+sizemat(end)=1;
+meanmat = repmat(mean(mean(meanmat)), sizemat);
