@@ -1,6 +1,7 @@
 copyfile(fullfile(para.path_net, '*'), para.path_output);
+parpool_num = 8;
 if isempty(gcp('nocreate'))
-    parpool(1);
+    parpool(parpool_num);
 end
 while ~exist('iter', 'var') || iter < max_iter
 
@@ -34,9 +35,16 @@ while ~exist('iter', 'var') || iter < max_iter
     end
     
     %%start train
-    train_batch_id = trainid(mod(nowid:nowid+para.num_per_batch-1, para.data_num)+1);
-    pf_data = parfeval(@load_batch_data, 1, list_train(train_batch_id), rect_train(train_batch_id,:), label_train(train_batch_id), meanmat, para);
+    %prefetch some batches data
+    for iter = 1 : parpool_num
+        train_batch_id = trainid(mod(nowid:nowid+para.num_per_batch-1, para.data_num)+1);
+        nowid = nowid + para.num_per_batch;
+        pf_data(iter) = parfeval(@load_batch_data, 1, list_train(train_batch_id), rect_train(train_batch_id,:), label_train(train_batch_id), meanmat, para);
+    end
+%     train_batch_id = trainid(mod(nowid:nowid+para.num_per_batch-1, para.data_num)+1);
+%     pf_data = parfeval(@load_batch_data, 1, list_train(train_batch_id), rect_train(train_batch_id,:), label_train(train_batch_id), meanmat, para);
     for iter = iter_:max_iter
+        pf_id_this_batch = mod(iter, parpool_num)+1;
         shuffle_data;
         drawnow;
         %this data preparing part use 0.15s for 8*32=256 images
@@ -45,11 +53,11 @@ while ~exist('iter', 'var') || iter < max_iter
         train_batch_id = trainid(mod(nowid:nowid+para.num_per_batch-1, para.data_num)+1);
         nowid = nowid + para.num_per_batch;
         if isempty(gcp('nocreate'))
-            parpool(1);
+            parpool(parpool_num);
         else
-            train_batch = fetchOutputs(pf_data);
+            train_batch = fetchOutputs(pf_data(pf_id_this_batch));
         end
-        pf_data = parfeval(@load_batch_data, 1, list_train(train_batch_id), rect_train(train_batch_id,:), label_train(train_batch_id), meanmat, para);
+        pf_data(pf_id_this_batch) = parfeval(@load_batch_data, 1, list_train(train_batch_id), rect_train(train_batch_id,:), label_train(train_batch_id), meanmat, para);
 %         train_batch = load_batch_data(list_train(train_batch_id), rect_train(train_batch_id,:), label_train(train_batch_id), meanmat, para);
         %this training part spend 1.014s for 8*32=256 images
         thisbatchid = thisbatchid + 1;
