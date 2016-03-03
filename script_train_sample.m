@@ -6,11 +6,11 @@ para.pre_load_data = 0;
 para.test_lfw = 1;
 para.test_xfext = 1;
 %compute phase
-para.gpuid = 4:7;
+para.gpuid = 0:7;
 para.num_per_gpu = 64;
 para.augment = 4;
 para.num_per_batch = numel(para.gpuid) * para.num_per_gpu;
-para.input_size = 224;
+para.input_size = 96;
 para.feature_length = 128;
 para.feature_layer_name = 'fc128';
 para.model_name = 'GoogleNetbn_for_face_fc128_40145';
@@ -21,10 +21,11 @@ para.seed_matlab = randi(65535);
 para.data_shuffle_interval = 'epoch';
 para.data_train = 'annotation_big_train.mat';
 para.model_init = '';
-para.model_recovery = '';
+para.model_recovery = 'iter64000.solverstate';
 para.data_channels = 3;
-para.gray_augment_ratio = 0.5;
-para.fast_meanmat = 1;
+para.gray_augment_ratio = 0.05;
+para.fast_meanmat = 0;
+para.meanmat_dir = 'D:\YuLiu\caffeDNN\data\meanmat96.mat';
 %debug phase
 para.debug = 0;
 
