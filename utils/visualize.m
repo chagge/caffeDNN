@@ -21,9 +21,14 @@ function  visualize( blob )
     bmax = max(max(max(max(blob))));
     blob = (blob - bmin) / (bmax - bmin);
     fprintf('min: %f max: %f\n', bmin, bmax);
+    if size(blob, 3)==3
+        color = 3;
+    else
+        color = 1;
+    end
     for i = 1 : bsize(4)
         subplot(c,r,i)
-        imshow(blob(:,:,:,i));
+        imshow(blob(:,:,1:color,i));
     end
 end
 
